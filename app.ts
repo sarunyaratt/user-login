@@ -3,13 +3,14 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { connect } from './config/database';
 import User from './model/user';
-import { verifyToken as auth } from './middleware/auth';
+import passport from './middleware/passport';
 
 connect();
 
 const app = express();
 
 app.use(express.json());
+app.use(passport.initialize());
 
 interface RegisterRequestBody {
     first_name: string;
@@ -109,7 +110,7 @@ app.post("/login", async (req: Request<{}, {}, LoginRequestBody>, res: Response)
     }
 });
 
-app.post('/welcome', auth, (req: Request, res: Response) => {
+app.post('/welcome', passport.authenticate('jwt', { session: false }), (req: Request, res: Response) => {
     res.status(200).send('Welcome 🙋‍♂️');
 });
 
